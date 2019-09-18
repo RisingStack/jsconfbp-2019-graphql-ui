@@ -1,0 +1,77 @@
+@import 'bootstrap/scss/bootstrap.scss';
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #e9ecef;
+}
+
+.navbar {
+  font-size: calc(10px + 1vmin);
+  height: 60px;
+  margin-bottom: 20px;
+  &-text {
+    color: white;
+    margin-right: 10px;
+  }
+  &-nav a {
+    margin: 10px;
+    color: #17a2b8;
+  }
+}
+
+.posts {
+  &-load-more{
+    margin: 10px 0 20px;
+  }
+  
+  &-card {
+    margin: 0 auto 10px;
+    max-width: 800px;
+  }
+
+  &-config {
+    position: relative;
+    margin-bottom: 10px;
+    .dropdown {
+      margin-right: 5px;
+    }
+    .config-search {
+      right: 0;
+      position: absolute;
+    }
+  }
+}
+
+.post {
+  &-loader {
+    margin: 100px auto;
+    width: 33px;
+  }
+  &-commentForm {
+    max-width: 600px;
+    margin: 0 auto 40px;
+  }
+  .comments-card {
+    margin: 0 auto 5px;
+    max-width: 600px;
+  }
+  .comments-load-more{
+    margin: 10px 0 20px;
+  }
+  .commentForm-submit {
+    margin-top: 5px;
+  }
+  .comment-date {
+    display: inline-block;
+    font-size: 14px;
+    color: gray;
+    right: 10px;
+    position: absolute;
+  }
+}
+
