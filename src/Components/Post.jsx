@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Query } from '@apollo/react-components';
 import {
   Button, Container, Card, Row, Jumbotron, Spinner, Form,
 } from 'react-bootstrap';
@@ -6,14 +7,11 @@ import { get } from 'lodash';
 import { DateTime } from 'luxon';
 import PropTypes from 'prop-types';
 
+import queries from '../query';
+
 const Post = ({ postId }) => {
   const [commentContent, setCommentContent] = useState('');
   const [commentCreateIsLoading] = useState(false);
-
-  // TODO: TASK 3. EXTRA query post with hook
-  console.log(postId);
-  const postIsLoading = false;
-  const post = {};
 
   // TODO: TASK 4. query comments
   const commentIsLoading = false;
@@ -28,21 +26,25 @@ const Post = ({ postId }) => {
 
   return (
     <Container className="post">
-      {/* TODO: TASK 3. query post with component */}
-      {postIsLoading
-        ? <div className="post-loader"><Spinner animation="border" /></div>
-        : (
-          <Jumbotron>
-            <h1>{post.title}</h1>
-            <footer className="blockquote-footer">
-              {get(post, 'author.username')}
-              <div>{DateTime.fromISO(post.timestamp).toFormat('HH:mm - dd/LL/yyyy')}</div>
-            </footer>
-            <br />
-            <p>{post.description}</p>
-            <p>{post.content}</p>
-          </Jumbotron>
-        )}
+      <Query query={queries.post.GET_POSTS_QUERY} variables={{ filters: [{ field: 'id', operation: 'eq', value: postId }], limit: 1 }}>
+        {({ loading: postIsLoading, data: postsData }) => {
+          const post = get(postsData, 'posts.edges[0].node', {});
+          return (postIsLoading
+            ? <div className="post-loader"><Spinner animation="border" /></div>
+            : (
+              <Jumbotron>
+                <h1>{post.title}</h1>
+                <footer className="blockquote-footer">
+                  {get(post, 'author.username')}
+                  <div>{DateTime.fromISO(post.timestamp).toFormat('HH:mm - dd/LL/yyyy')}</div>
+                </footer>
+                <br />
+                <p>{post.description}</p>
+                <p>{post.content}</p>
+              </Jumbotron>
+            ));
+        }}
+      </Query>
       <div className="post-commentForm">
         <h4>Write a comment</h4>
         <Form onSubmit={handleCreateComment}>
