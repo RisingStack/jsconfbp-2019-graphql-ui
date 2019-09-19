@@ -1,6 +1,13 @@
 import gql from 'graphql-tag';
 
-// TODO: TASK 2. EXTRA User Fragment
+const user = gql`
+  fragment User on User {
+    id
+    name
+    username
+    email
+  }
+`;
 
 const comment = gql`
   fragment Comment on Comment {
@@ -8,12 +15,10 @@ const comment = gql`
     content
     timestamp
     author {
-      id
-      name
-      username
-      email
+      ...User
     }
   }
+  ${user}
 `;
 
 const post = gql`
@@ -24,10 +29,7 @@ const post = gql`
     content
     timestamp
     author {
-      id
-      name
-      username
-      email
+      ...User
     }
     comments {
       pageInfo {
@@ -42,10 +44,12 @@ const post = gql`
       }
     }
   }
+  ${user}
   ${comment}
 `;
 
 export default {
+  user,
   post,
   comment,
 };

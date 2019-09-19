@@ -1,19 +1,32 @@
 import React, { useState, useContext } from 'react';
 import { Redirect, Link } from 'react-router-dom';
+import { useApolloClient } from '@apollo/react-hooks';
 import { Button, Form, Container } from 'react-bootstrap';
 
 import UserContext from '../Context/UserContext';
+import queries from '../query';
 
 const Signin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading] = useState(false);
-  const { user } = useContext(UserContext);
+  const [isLoading, setIsLoading] = useState(false);
+  const { user, setUser } = useContext(UserContext);
+  const apolloClient = useApolloClient();
 
-  // TODO: TASK 2. handleSingin
   const handleSingin = (event) => {
     event.preventDefault();
-    console.log('handleSingin');
+    if (email && password && !isLoading) {
+      setIsLoading(true);
+      apolloClient.query({
+        query: queries.user.SIGNIN_QUERY,
+        variables: { email, password },
+      }).then(({ data: { signin } }) => {
+        setUser(signin);
+      }).catch(() => {
+        alert('Wrong email/password');
+        setIsLoading(false);
+      });
+    }
   };
 
   if (user) return <Redirect to="/" />;

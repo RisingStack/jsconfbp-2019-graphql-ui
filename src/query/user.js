@@ -1,5 +1,5 @@
 import gql from 'graphql-tag';
-// TODO: TASK 2. EXTRA User Fragment for every query/mutation
+import fragments from './fragments';
 
 const GET_USERS_QUERY = gql`
   query getUsers(
@@ -21,18 +21,28 @@ const GET_USERS_QUERY = gql`
       }
       edges {
         node {
-          id
-          name
-          username
-          email
+          ...User
         }
       }
     }
   }
+  ${fragments.user}
 `;
 
-// TODO: TASK 2. SIGNIN_QUERY
-const SIGNIN_QUERY = '';
+const SIGNIN_QUERY = gql`
+  query signin(
+    $email: String!
+    $password: String!
+  ) {
+    signin (
+      email: $email
+      password: $password
+    ) {
+      ...User
+    }
+  }
+  ${fragments.user}
+`;
 
 const CREATE_USER_MUTATION = gql`
   mutation createUser(
@@ -48,13 +58,11 @@ const CREATE_USER_MUTATION = gql`
         email: $email
         password: $password
       }) {
-        id
-        name
-        username
-        email
+        ...User
       }
     }
   }
+  ${fragments.user}
 `;
 
 export default {
