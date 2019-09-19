@@ -4,6 +4,15 @@ import { HttpLink } from 'apollo-link-http';
 import { onError } from 'apollo-link-error';
 import { ApolloLink } from 'apollo-link';
 
+const globalLoader = new ApolloLink((operation, forward) => {
+  // Use mobx or redux (or some other state manager library) for a global store
+  console.log('add loading count');
+  return forward(operation).map((response) => {
+    console.log('remove loading count');
+    return response;
+  });
+});
+
 export default new ApolloClient({
   link: ApolloLink.from([
     onError(({ graphQLErrors, networkError }) => {
@@ -16,6 +25,7 @@ export default new ApolloClient({
         console.log(`[Network error]: ${networkError}`);
       }
     }),
+    globalLoader,
     new HttpLink({
       uri: 'http://localhost:8000/graphql',
       credentials: 'same-origin',
