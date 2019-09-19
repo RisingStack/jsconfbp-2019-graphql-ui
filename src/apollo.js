@@ -5,10 +5,10 @@ import { onError } from 'apollo-link-error';
 import { ApolloLink } from 'apollo-link';
 
 const globalLoader = new ApolloLink((operation, forward) => {
-  // Use mobx or redux (or some other state manager library) for a global store
-  console.log('add loading count');
+  // Use Mobx or Redux (or other) for a global state manager
+  console.log('increment loading count');
   return forward(operation).map((response) => {
-    console.log('remove loading count');
+    console.log('decrement loading count');
     return response;
   });
 });
