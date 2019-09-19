@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useQuery } from '@apollo/react-hooks';
+import React, { useState, useContext } from 'react';
+import { useQuery, useApolloClient } from '@apollo/react-hooks';
 import {
   Button, Container, Card, Row, Jumbotron, Spinner, Form,
 } from 'react-bootstrap';
@@ -7,11 +7,14 @@ import { get } from 'lodash';
 import { DateTime } from 'luxon';
 import PropTypes from 'prop-types';
 
+import UserContext from '../Context/UserContext';
 import queries from '../query';
 
 const Post = ({ postId }) => {
   const [commentContent, setCommentContent] = useState('');
-  const [commentCreateIsLoading] = useState(false);
+  const [commentCreateIsLoading, setCommentCreateIsLoading] = useState(false);
+  const { user } = useContext(UserContext);
+  const apolloClient = useApolloClient();
 
   const {
     loading: postIsLoading,
@@ -24,15 +27,44 @@ const Post = ({ postId }) => {
   });
   const post = get(postsData, 'posts.edges[0].node', {});
 
-  // TODO: TASK 4. query comments
-  const commentIsLoading = false;
-  const comments = [];
-  const hasNextCommentPage = false;
+  const {
+    loading: commentIsLoading,
+    data: commentsData,
+    fetchMore: fetchMoreComment,
+    refetch: refetchComments,
+  } = useQuery(queries.comment.GET_COMMENTS_QUERY, {
+    variables: {
+      filters: [{ field: 'post', operation: 'eq', value: postId }],
+      order: {
+        field: 'timestamp',
+        direction: 'desc',
+      },
+      offset: 0,
+      limit: 3,
+    },
+    fetchPolicy: 'cache-and-network',
+  });
+  const comments = get(commentsData, 'comments.edges', []);
+  const hasNextCommentPage = get(commentsData, 'comments.pageInfo.hasNextPage', false);
 
-  // TODO: TASK 4. EXTRA handleCreateComment
   const handleCreateComment = (event) => {
     event.preventDefault();
-    console.log('handleCreateComment');
+    if (commentContent && user && !commentCreateIsLoading) {
+      setCommentCreateIsLoading(true);
+      apolloClient.mutate({
+        mutation: queries.comment.CREATE_COMMENT_MUTATION,
+        variables: {
+          content: commentContent, author: user.email, post: postId,
+        },
+      }).then(() => {
+        setCommentCreateIsLoading(false);
+        setCommentContent('');
+        refetchComments();
+      }).catch(() => {
+        alert('Something went wrong...');
+        setCommentCreateIsLoading(false);
+      });
+    }
   };
 
   return (
@@ -88,8 +120,26 @@ const Post = ({ postId }) => {
           className="comments-load-more"
           disabled={commentIsLoading || !hasNextCommentPage}
           variant="primary"
-          // TODO: TASK 4. fetch more comments
-          onClick={() => (console.log('fetchMoreComment'))}
+          onClick={() => (
+            fetchMoreComment({
+              variables: { offset: comments.length },
+              updateQuery: (prev, { fetchMoreResult }) => (
+                fetchMoreResult
+                  ? ({
+                    ...prev,
+                    comments: {
+                      ...prev.comments,
+                      pageInfo: fetchMoreResult.comments.pageInfo,
+                      edges: [
+                        ...prev.comments.edges,
+                        ...fetchMoreResult.comments.edges,
+                      ],
+                    },
+                  })
+                  : prev
+              ),
+            })
+          )}
         >
           {(commentIsLoading || hasNextCommentPage) ? 'Load more' : 'Out of comments'}
         </Button>

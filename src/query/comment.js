@@ -29,8 +29,24 @@ const GET_COMMENTS_QUERY = gql`
   ${fragments.comment}
 `;
 
-// TODO: TASK 4. EXTRA write comment creation mutation
-const CREATE_COMMENT_MUTATION = null;
+const CREATE_COMMENT_MUTATION = gql`
+  mutation createComment(
+    $content: String!
+    $author: String!
+    $post: ID!
+  ) {
+    comment {
+      createComment(input: {
+        content: $content
+        author: $author
+        post: $post
+      }) {
+        ...Comment
+      }
+    }
+  }
+  ${fragments.comment}
+`;
 
 export default {
   GET_COMMENTS_QUERY,
