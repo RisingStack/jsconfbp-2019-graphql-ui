@@ -1,5 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { ApolloProvider } from '@apollo/react-hooks';
+import { ApolloProvider as HooksApolloProvider } from '@apollo/react-hooks';
+import { ApolloProvider as ComponentsApolloProvider } from '@apollo/react-components';
 import {
   BrowserRouter,
   Switch,
@@ -9,6 +10,7 @@ import {
 import PropTypes from 'prop-types';
 
 import client from './apollo';
+import Hello from './Components/Hello';
 import Singin from './Components/Singin';
 import Register from './Components/Register';
 import Post from './Components/Post';
@@ -43,21 +45,24 @@ const App = () => {
   }, [user]);
 
   return (
-    <ApolloProvider client={client}>
-      <UserProvider value={{ user, setUser }}>
-        <BrowserRouter>
-          <Header />
-          <Switch>
-            <ProtectedRoute exact path="/" component={Posts} />
-            <ProtectedRoute exact path="/postform" component={PostForm} />
-            <Route exact path="/register" component={Register} />
-            <Route exact path="/signin" component={Singin} />
-            <ProtectedRoute exact path="/post/:postId" component={({ match: { params } }) => <Post {...params} />} />
-            <Route component={NoMatch} />
-          </Switch>
-        </BrowserRouter>
-      </UserProvider>
-    </ApolloProvider>
+    <HooksApolloProvider client={client}>
+      <ComponentsApolloProvider client={client}>
+        <UserProvider value={{ user, setUser }}>
+          <BrowserRouter>
+            <Header />
+            <Switch>
+              <ProtectedRoute exact path="/" component={Posts} />
+              <ProtectedRoute exact path="/postform" component={PostForm} />
+              <Route exact path="/register" component={Register} />
+              <Route exact path="/signin" component={Singin} />
+              <Route exact path="/hello" component={Hello} />
+              <ProtectedRoute exact path="/post/:postId" component={({ match: { params } }) => <Post {...params} />} />
+              <Route component={NoMatch} />
+            </Switch>
+          </BrowserRouter>
+        </UserProvider>
+      </ComponentsApolloProvider>
+    </HooksApolloProvider>
   );
 };
 

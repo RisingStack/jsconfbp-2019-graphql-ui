@@ -10,6 +10,7 @@ const Header = () => {
       <Nav className="mr-auto">
         <Link to="/">Posts</Link>
         <Link to="/postform">Create Post</Link>
+        <Link to="/hello">Hello</Link>
       </Nav>
       <Navbar.Collapse className="justify-content-end">
         <Navbar.Text>
